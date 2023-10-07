@@ -15,10 +15,7 @@ sem_t mutexCons, mutexProd;
 
 char buffer[MAX_LINHAS][MAX_CARACTERES]; 
 
-void *consumidor(){
-    int semVal;
-
-    while (1){
+void retira(){
     static int out=0;
     char * item;
     //aguarda slot cheio
@@ -27,13 +24,17 @@ void *consumidor(){
     sem_wait(&mutexCons);
     item = buffer[out];        
 
-    sem_getvalue(&slotCheio, &semVal);
     printf("%s", item);
 
     out = (out + 1) % MAX_LINHAS;
     sem_post(&mutexCons);
     //sinaliza um slot vazio
     sem_post(&slotVazio);
+}
+
+void *consumidor(){
+    while (1){
+        retira();
     }
 }
 
@@ -101,4 +102,4 @@ int main(int argc, char *argv[]){ //Produtora
     sem_destroy(&slotVazio);
     sem_destroy(&mutexCons);
     sem_destroy(&mutexProd);
-}   
+}     
